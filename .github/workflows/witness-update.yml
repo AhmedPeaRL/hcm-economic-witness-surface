@@ -1,0 +1,26 @@
+name: Economic Witness Update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'    # 
+
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update Witness Record
+        run: |
+          jq '.last_passage = (now | tostring)' witness.json > tmp.json
+          mv tmp.json witness.json
+
+      - name: Commit Witness
+        run: |
+          git config user.name "economic-witness"
+          git config user.email "witness@hcm"
+          git add witness.json
+          git commit -m "Witness: passage allowance observed" || echo "No change"
+          git push
